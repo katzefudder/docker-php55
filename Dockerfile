@@ -70,5 +70,7 @@ COPY scripts/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # * * * * * * * * * run Supervisor
 CMD ["/usr/bin/supervisord"]
 
+WORKDIR /var/www
+
 # * * * * * * * * * expose ports
 EXPOSE 22 80 443

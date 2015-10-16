@@ -1,0 +1,50 @@
+<VirtualHost *:80>
+    ServerName ###HOSTNAME###
+    DocumentRoot /var/www/public
+
+    SetEnv ENVIRONMENT docker
+
+    <Directory />
+        Options FollowSymLinks
+        AllowOverride None
+    </Directory>
+
+    <Directory /var/www/public>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    CustomLog ${APACHE_LOG_DIR}/###HOSTNAME###.log combined
+</VirtualHost>
+
+<IfModule mod_ssl.c>
+    <VirtualHost _default_:443>
+        ServerAdmin flo@katzefudder.de
+        DocumentRoot /var/www/public
+
+        SetEnv ENVIRONMENT docker
+
+        <Directory />
+            Options FollowSymLinks
+            AllowOverride None
+        </Directory>
+
+        <Directory /var/www/public>
+            Options Indexes FollowSymLinks MultiViews
+            AllowOverride All
+            Order allow,deny
+            allow from all
+        </Directory>
+
+        ErrorLog ${APACHE_LOG_DIR}/###HOSTNAME###.log
+        LogLevel warn
+        CustomLog ${APACHE_LOG_DIR}/###HOSTNAME###.log combined
+
+        SSLEngine on
+        SSLCertificateFile    /etc/apache2/ssl/ssl.crt
+        SSLCertificateKeyFile /etc/apache2/ssl/ssl.key
+        SSLCertificateChainFile /etc/apache2/ssl/ssl.crt
+    </VirtualHost>
+</IfModule>

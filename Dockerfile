@@ -14,6 +14,8 @@ RUN usermod -u ${BOOT2DOCKER_ID} www-data && \
 usermod -G staff www-data
 RUN groupmod -g $(($BOOT2DOCKER_GID + 10000)) $(getent group $BOOT2DOCKER_GID | cut -d: -f1)
 
+RUN export TERM=xterm
+
 RUN apt-get update && apt-get -y install apache2 ant php5 php5-cli \
 libapache2-mod-php5 curl php5-mysql php5-gd php-pear php-apc php5-curl php5-intl php5-imap php5-ldap \
 php5-mcrypt php5-xdebug php5-sqlite php5-apcu php5-mysql libssh2-1-dev libssh2-php exim4 \

@@ -7,15 +7,12 @@ ENV HOSTNAME docker.local
 
 LABEL Description="Frontend Server PHP 5.5" Vendor="katzefudder.de"
 
-ENV BOOT2DOCKER_ID 1000
+# FIX Apache/PHP write permissions to the app
+ENV BOOT2DOCKER_ID 1001
 ENV BOOT2DOCKER_GID 50
-
-# Tweaks to give Apache/PHP write permissions to the app
 RUN usermod -u ${BOOT2DOCKER_ID} www-data && \
-	usermod -G staff www-data && \
-
+usermod -G staff www-data
 RUN groupmod -g $(($BOOT2DOCKER_GID + 10000)) $(getent group $BOOT2DOCKER_GID | cut -d: -f1)
-RUN groupmod -g ${BOOT2DOCKER_GID} staff
 
 RUN apt-get update && apt-get -y install apache2 ant php5 php5-cli \
 libapache2-mod-php5 curl php5-mysql php5-gd php-pear php-apc php5-curl php5-intl php5-imap php5-ldap \

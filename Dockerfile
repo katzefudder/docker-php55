@@ -1,4 +1,4 @@
-FROM katzefudder/ubuntu1404
+FROM katzefudder/docker-ubuntu-14.04
 
 MAINTAINER Florian Dehn <flo@katzefudder.de>
 

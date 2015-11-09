@@ -72,14 +72,8 @@ RUN npm install -g bower
 # * * * * * * * * * export TERM
 RUN export TERM=xterm
 
-# * * * * * * * * * Root password set to a12sdf
-RUN echo 'root:a12sdf' | chpasswd
-
-ENV NOTVISIBLE "in users profile"
-RUN echo "export VISIBLE=now" >> /etc/profile
-
 # * * * * * * * * * start supervisor and manage ssh and apache2
-RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/run/sshd /var/log/supervisor
+RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/log/supervisor
 COPY scripts/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # * * * * * * * * * run Supervisor
@@ -88,4 +82,4 @@ CMD ["/usr/bin/supervisord"]
 WORKDIR /var/www
 
 # * * * * * * * * * expose ports
-EXPOSE 22 80 443
+EXPOSE 80 443

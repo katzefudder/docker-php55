@@ -2,19 +2,14 @@ FROM katzefudder/docker-ubuntu-14.04
 
 MAINTAINER Florian Dehn <flo@katzefudder.de>
 
-# define hostname
-ENV HOSTNAME docker.local
-
 LABEL Description="Frontend Server PHP 5.5" Vendor="katzefudder.de"
 
-# FIX Apache/PHP write permissions to the app
 ENV DOCKER_USER_ID 501
 ENV DOCKER_USER_GID 20
 
 ENV BOOT2DOCKER_ID 1000
 ENV BOOT2DOCKER_GID 50
 
-# Tweaks to give Apache/PHP write permissions to the app
 RUN usermod -u ${BOOT2DOCKER_ID} www-data && \
     usermod -G staff www-data && \
     useradd -r mysql && \
@@ -68,9 +63,6 @@ RUN npm install -g grunt-cli
 
 # * * * * * * * * * install Bower
 RUN npm install -g bower
-
-# * * * * * * * * * export TERM
-RUN export TERM=xterm
 
 # * * * * * * * * * start supervisor and manage ssh and apache2
 RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/log/supervisor

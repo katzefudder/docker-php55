@@ -48,7 +48,7 @@ RUN mkdir -p /etc/apache2/ssl
 # * * * * * * * * * generate SSL key
 RUN openssl genrsa -out /etc/apache2/ssl/ssl.key 2048; openssl req -new -x509 -key /etc/apache2/ssl/ssl.key -out /etc/apache2/ssl/ssl.crt -days 3650 -subj /CN=${HOSTNAME}
 
-RUN echo "ServerName ${HOSTNAME}" >> /etc/apache2/apache2.conf
+RUN echo "ServerName docker.local" >> /etc/apache2/apache2.conf
 
 # * * * * * * * * * install composer
 RUN curl -sS https://getcomposer.org/installer | php

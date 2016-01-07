@@ -52,7 +52,7 @@ RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/lo
 RUN apt-get install nodejs -y && npm install -g grunt-cli && npm install -g bower
 
 # * * * * * * * * * start supervisor and manage ssh and apache2
-RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/log/supervisor
+RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/log/supervisor /var/run/sshd
 COPY scripts/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # * * * * * * * * * run Supervisor

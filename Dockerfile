@@ -28,9 +28,14 @@ rm -Rf /var/lib/apt/lists/*
 # * * * * * * * * * adjust php ENV var settings
 RUN sed -i -e "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/" /etc/php5/cli/php.ini
 
-# * * * * * * * * * config php mods
+COPY scripts/xdebug.ini /usr/local/etc/php/conf.d/
+
+# * * * * * * * * * config php mods & xdebug settings
 RUN php5enmod imap mcrypt
-RUN echo "apc.enabled=0" >> /etc/php5/mods-available/apcu.ini && echo "xdebug.max_nesting_level = 400" >> /etc/php5/mods-available/xdebug.ini
+RUN echo "apc.enabled=0" >> /etc/php5/mods-available/apcu.ini && \
+	echo "xdebug.max_nesting_level = 400" >> /etc/php5/mods-available/xdebug.ini && \
+	echo "xdebug.remote_enable=on" >> /etc/php5/mods-available/xdebug.ini && \
+	echo "xdebug.remote_autostart=off" >> /etc/php5/mods-available/xdebug.ini
 
 # * * * * * * * * * setup Apache
 RUN chown www-data: /var/www -R && chmod -R 777 /var/www
@@ -41,7 +46,8 @@ RUN /tmp/make_vhost.sh ${HOSTNAME} /etc/apache2/sites-available/${HOSTNAME}.conf
 RUN a2ensite ${HOSTNAME}.conf && a2dissite 000-default && a2enmod rewrite ssl && mkdir -p /etc/apache2/ssl
 
 # * * * * * * * * * generate SSL key
-RUN openssl genrsa -out /etc/apache2/ssl/ssl.key 2048; openssl req -new -x509 -key /etc/apache2/ssl/ssl.key -out /etc/apache2/ssl/ssl.crt -days 3650 -subj /CN=${HOSTNAME}
+RUN openssl genrsa -out /etc/apache2/ssl/ssl.key 2048; \
+	openssl req -new -x509 -key /etc/apache2/ssl/ssl.key -out /etc/apache2/ssl/ssl.crt -days 3650 -subj /CN=${HOSTNAME}
 
 # * * * * * * * * * Root password set to a12sdf
 RUN echo "ServerName docker.local" >> /etc/apache2/apache2.conf && echo 'root:a12sdf' | chpasswd
@@ -53,6 +59,7 @@ RUN apt-get install nodejs -y && npm install -g grunt-cli && npm install -g bowe
 
 # * * * * * * * * * start supervisor and manage ssh and apache2
 RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/log/supervisor /var/run/sshd
+RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/g' /etc/ssh/sshd_config
 COPY scripts/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # * * * * * * * * * run Supervisor

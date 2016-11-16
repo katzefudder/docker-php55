@@ -4,19 +4,7 @@ MAINTAINER Florian Dehn <flo@katzefudder.de>
 
 LABEL Description="Frontend Server PHP 5.5" Vendor="katzefudder.de"
 
-ENV DOCKER_USER_ID 501
-ENV DOCKER_USER_GID 20
-
-ENV BOOT2DOCKER_ID 1000
-ENV BOOT2DOCKER_GID 50
-
-RUN usermod -u ${BOOT2DOCKER_ID} www-data && \
-	usermod -G staff www-data && \
-	useradd -r mysql && \
-	usermod -G staff mysql
-
-RUN groupmod -g $(($BOOT2DOCKER_GID + 10000)) $(getent group $BOOT2DOCKER_GID | cut -d: -f1)
-RUN groupmod -g ${BOOT2DOCKER_GID} staff
+ENV HOSTNAME docker-php55
 
 RUN apt-get update && apt-get -y install apache2 php5 php5-cli \
 libapache2-mod-php5 curl php5-mysql php5-gd php-pear php-apc php5-curl php5-intl php5-imap php5-ldap \
@@ -32,10 +20,7 @@ COPY scripts/xdebug.ini /usr/local/etc/php/conf.d/
 
 # * * * * * * * * * config php mods & xdebug settings
 RUN php5enmod imap mcrypt
-RUN echo "apc.enabled=0" >> /etc/php5/mods-available/apcu.ini && \
-	echo "xdebug.max_nesting_level = 400" >> /etc/php5/mods-available/xdebug.ini && \
-	echo "xdebug.remote_enable=on" >> /etc/php5/mods-available/xdebug.ini && \
-	echo "xdebug.remote_autostart=off" >> /etc/php5/mods-available/xdebug.ini
+RUN echo "apc.enabled=0" >> /etc/php5/mods-available/apcu.ini
 
 # * * * * * * * * * setup Apache
 RUN chown www-data: /var/www -R && chmod -R 777 /var/www
@@ -45,6 +30,11 @@ RUN /tmp/make_vhost.sh ${HOSTNAME} /etc/apache2/sites-available/${HOSTNAME}.conf
 
 RUN a2ensite ${HOSTNAME}.conf && a2dissite 000-default && a2enmod rewrite ssl && mkdir -p /etc/apache2/ssl
 
+# * * * * * * * * * add SSH public key
+RUN mkdir /root/.ssh/
+ADD keys/server.key /root/.ssh/server.key
+RUN cat /root/.ssh/server.key >> /root/.ssh/authorized_keys
+
 # * * * * * * * * * generate SSL key
 RUN openssl genrsa -out /etc/apache2/ssl/ssl.key 2048; \
 	openssl req -new -x509 -key /etc/apache2/ssl/ssl.key -out /etc/apache2/ssl/ssl.crt -days 3650 -subj /CN=${HOSTNAME}
@@ -52,20 +42,17 @@ RUN openssl genrsa -out /etc/apache2/ssl/ssl.key 2048; \
 # * * * * * * * * * Root password set to a12sdf
 RUN echo "ServerName docker.local" >> /etc/apache2/apache2.conf && echo 'root:a12sdf' | chpasswd
 
-# * * * * * * * * * install composer
-RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && curl -sL https://deb.nodesource.com/setup | bash -
-
+# * * * * * * * * * install composer && nodejs
+RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 RUN apt-get install nodejs -y && npm install -g grunt-cli && npm install -g bower
 
 # * * * * * * * * * start supervisor and manage ssh and apache2
-RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/log/supervisor /var/run/sshd
-RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/g' /etc/ssh/sshd_config
-COPY scripts/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/run/sshd
 
-# * * * * * * * * * run Supervisor
-CMD ["/usr/bin/supervisord"]
+# * * * * * * * * * run Apache
+CMD ["apachectl", "-D", "FOREGROUND"]
 
 WORKDIR /var/www
 
 # * * * * * * * * * expose ports
-EXPOSE 22 80 443 9000
+EXPOSE 22 80 443

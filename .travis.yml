@@ -1,7 +1,5 @@
-sudo: required
-
-services:
-  - docker
-
 install:
   - docker build --no-cache --force-rm -t katzefudder/docker-php55 .
+
+script:
+  - docker run katzefudder/docker-php55 php -v

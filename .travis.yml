@@ -5,4 +5,3 @@ services:
 
 install:
   - docker build --no-cache --force-rm -t katzefudder/docker-php55 .
-  - docker push katzefudder/docker-php55

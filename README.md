@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/katzefudder/katzefudder-container-php55.svg?branch=master)](https://travis-ci.org/katzefudder/katzefudder-container-php55)
+
 # SSH Key
 Add the following key to `/home/username/.ssh/docker`:
 ```

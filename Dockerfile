@@ -4,6 +4,8 @@ MAINTAINER Florian Dehn <flo@katzefudder.de>
 
 LABEL Description="Frontend Server PHP 5.5" Vendor="katzefudder.de"
 
+ENV TERM=xterm DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get -y install apache2 php5 php5-cli \
 libapache2-mod-php5 curl php5-mysql php5-gd php-pear php-apc php5-curl php5-intl php5-imap php5-ldap \
 php5-mcrypt php5-xdebug php5-sqlite php5-apcu php5-mysql libssh2-1-dev libssh2-php exim4 \

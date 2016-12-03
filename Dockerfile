@@ -47,6 +47,7 @@ RUN echo "ServerName docker.local" >> /etc/apache2/apache2.conf
 # * * * * * * * * * install composer && nodejs
 RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 RUN apt-get install nodejs -y && npm install -g grunt-cli && npm install -g bower
+RUN gem install compass
 
 # * * * * * * * * * prepare directories
 RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/run/sshd
